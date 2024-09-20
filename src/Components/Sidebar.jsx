@@ -102,14 +102,6 @@ const Sidebar = () => {
                   Stock<i class="fa-regular fa-bookmark ps-2"></i>
                 </a>
               </div>
-              <div class="sub-menu-item text-nowrap  m-2">
-                <a
-                  href="/location"
-                  class="p-2 d-block text-decoration-none  d-flex justify-content-between align-items-center"
-                >
-                  Location<i class="fa-regular fa-bookmark ps-2"></i>
-                </a>
-              </div>
             </div>
           </div>
         </li>

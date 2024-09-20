@@ -113,7 +113,7 @@ const Inventory = () => {
   return (
     <div class="container-fluid p-0 position-relative">
       <div class="bg position-absolute top-0 start-0 end-0"></div>
-      <Sidebar/>
+      <Sidebar />
 
       {/* <!--===================== home section ==================--> */}
       <section class="home-section">
@@ -650,12 +650,15 @@ const Inventory = () => {
                         type="button"
                         className="bg-transparent border-0 add"
                         data-bs-toggle="modal"
-                        data-bs-target="#myModaldelete"
+                        data-bs-target={`#myModaldelete-${category.id}`}
                       >
                         <img src="assets/vectors/Frame (5).png" alt="" />
                       </button>
 
-                      <div className="modal text-start fade" id="myModaldelete">
+                      <div
+                        className="modal text-start fade myModaldelete"
+                        id={`myModaldelete-${category.id}`}
+                      >
                         <div className="modal-dialog">
                           <div className="modal-content">
                             <div className="modal-header one rounded-0">

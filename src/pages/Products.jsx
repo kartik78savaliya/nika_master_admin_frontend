@@ -4,6 +4,11 @@ import axios from "axios";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("authToken="))
+    ?.split("=")[1];
+
   useEffect(() => {
     try {
       axios
@@ -16,6 +21,92 @@ const Products = () => {
       console.log(error);
     }
   }, []);
+
+
+  const [product, setProduct] = useState({
+      skuId: '',
+      productName: '',
+      category: '',
+      priceWithoutGst: '',
+      hsnCode: '',
+      gstRate: '',
+      discount: '',
+      rating:'',
+      review:'',
+      aboutThisItem:'',
+      productDescription: '',
+      fVideo: '',
+      fImage1: '',
+      fImage2: '',
+      fImage3: '',
+      fImage4: '',
+      fImage5: '',
+      fImage6: '',
+      fImage7: '',  
+      fImage8: '',
+      fImage9: '',
+      fImage10: '',
+  });
+  
+  const handleChange = (e) => {
+      setProduct({
+        ...product,
+        [e.target.name]: e.target.value,
+      });
+  };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const formData = new FormData();
+    
+    // Append each field to the FormData
+    Object.keys(product).forEach((key) => {
+      formData.append(key, product[key]);
+    });
+  
+    try {
+      await axios.post(
+        "http://localhost:2008/api/product/addproduct",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data', // This is important for file uploads
+          },
+          withCredentials: true,
+        }
+      );
+      alert('Product added successfully');
+    } catch (error) {
+      console.log(error);
+      alert('Failed to add product');
+    }
+  };
+  
+  
+  
+  const updateProduct = () => {
+    try {
+      axios.put("http://localhost:2008/api/product/updateproduct");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const deleteProduct = (id) => {
+    console.log(id);
+    try {
+      axios.delete(`http://localhost:2008/api/product/deleteproduct/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+        },
+        withCredentials: true, // Include credentials if necessary
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div class="container-fluid p-0 position-relative">
@@ -370,192 +461,172 @@ const Products = () => {
         </div>
 
         {/* <!-- The Modal --> */}
-        <div class="modal fade" id="myModal">
-          <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-              {/* <!-- Modal Header --> */}
-              <div class="modal-header one rounded-0">
-                <h4 class="modal-title">Add Product</h4>
-                <button
-                  type="button"
-                  class="btn-close btn"
-                  data-bs-dismiss="modal"
-                  title="close"
-                ></button>
-              </div>
+        {/* The Modal */}
+      <div className="modal fade" id="myModal">
+        <div className="modal-dialog modal-lg">
+          <div className="modal-content">
+            {/* Modal Header */}
+            <div className="modal-header one rounded-0">
+              <h4 className="modal-title">Add Product</h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
 
-              {/* <!-- Modal body --> */}
-              <div class="modal-body">
-                <form action="#">
-                  <div class="one py-3 px-3 pb-0">
-                    <div class="row">
-                      <div class="col-lg-6 col-12">
-                        <div class="d-flex flex-column">
-                          <label for="Product-SKU-id" class="my-3">
-                            Product SKU id
-                          </label>
-                          <input
-                            type="text"
-                            name="Product-SKU-id"
-                            id="Product-SKU-id"
-                            title="number"
-                            class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                            required
-                          />
-                        </div>
-                        <div class="d-flex flex-column my-2">
-                          <label for="Product-name" class="my-3">
-                            Product name
-                          </label>
-                          <input
-                            type="text"
-                            name="Product-name"
-                            id="Product-name"
-                            title="Enter Quantity"
-                            class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                            required
-                          />
-                        </div>
-                        <div class="d-flex flex-column my-2">
-                          <label for="Category" class="my-3">
-                            Category
-                          </label>
-                          <input
-                            type="text"
-                            name="Category"
-                            id="Category"
-                            title="time"
-                            class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                            required
-                          />
-                        </div>
-                        <div class="d-flex flex-column my-2">
-                          <label for="Price" class="my-3">
-                            Price
-                          </label>
-                          <input
-                            type="number"
-                            name="Price"
-                            id="Price"
-                            title="time"
-                            class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                            required
-                          />
-                        </div>
-                        <div class="d-flex flex-column my-2">
-                          <label for="HSN-code" class="my-3">
-                            HSN code
-                          </label>
-                          <input
-                            type="number"
-                            name="HSN-code"
-                            id="HSN-code"
-                            title="time"
-                            class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                            required
-                          />
-                        </div>
-                        <div class="d-flex flex-column my-2">
-                          <label for="GST-tax-rate" class="my-3">
-                            GST tax rate(%)
-                          </label>
-                          <input
-                            type="number"
-                            name="GST-tax-rate"
-                            id="GST-tax-rate"
-                            title="time"
-                            class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                            required
-                          />
-                        </div>
-                        <div class="d-flex flex-column my-2">
-                          <label for="MRP" class="my-3">
-                            MRP
-                          </label>
-                          <input
-                            type="number"
-                            name="MRP"
-                            id="MRP"
-                            title="time"
-                            class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                            required
-                          />
-                        </div>
-                        <div class="d-flex flex-column my-2">
-                          <label for="Description" class="my-3">
-                            Description
-                          </label>
+            {/* Modal Body */}
+            <div className="modal-body">
+              <form onSubmit={handleSubmit}>
+                <div className="one py-3 px-3 pb-0">
+                  <div className="row">
+                    <div className="col-lg-6 col-12">
+                      <div className="d-flex flex-column">
+                        <label htmlFor="skuId" className="my-3">
+                          Product SKU id
+                        </label>
+                        <input
+                          type="text"
+                          name="skuId"
+                          id="skuId"
+                          className="w-100 border rounded-3 py-1 px-2"
+                          value={product.skuId}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
 
-                          <textarea
-                            name="Description"
-                            id="Description"
-                            rows="5"
-                            class="W-100 border rounded-3 py-1 px-2 focus-ring-none"
-                            required
-                          ></textarea>
-                        </div>
+                      <div className="d-flex flex-column my-2">
+                        <label htmlFor="productName" className="my-3">
+                          Product Name
+                        </label>
+                        <input
+                          type="text"
+                          name="productName"
+                          id="productName"
+                          className="w-100 border rounded-3 py-1 px-2"
+                          value={product.productName}
+                          onChange={handleChange}
+                          required
+                        />
                       </div>
-                      <div class="col-lg-6 col-12">
-                        <div class="d-flex flex-column my-0 bg-white rounded-3 p-3">
-                          <label for="Employ-Mobile-No" class="my-3">
-                            Employ Mobile No.
-                          </label>
-                          <div class="row gy-lg-4 gy-md-3 gy-sm-2 gy-2">
-                            <div class="col-8 px-1 px-md-2">
-                              <img src="assets/images/image 169.png" alt="" />
-                            </div>
-                            <div class="col-4 px-1 px-md-2 d-flex flex-column justify-content-between">
-                              <img src="assets/images/image 169.png" alt="" />
-                              <img src="assets/images/image 169.png" alt="" />
-                            </div>
-                            <div class="col-4 px-1 px-md-2">
-                              <img src="assets/images/image 169.png" alt="" />
-                            </div>
-                            <div class="col-4 px-1 px-md-2">
-                              <img src="assets/images/image 169.png" alt="" />
-                            </div>
-                            <div class="col-4 px-1 px-md-2">
-                              <img src="assets/images/image 169.png" alt="" />
-                            </div>
-                            <div class="col-4 px-1 px-md-2">
-                              <img src="assets/images/image 169.png" alt="" />
-                            </div>
-                            <div class="col-4 px-1 px-md-2">
-                              <img src="assets/images/image 169.png" alt="" />
-                            </div>
-                            <div class="col-4 px-1 px-md-2">
-                              <img src="assets/images/image 169.png" alt="" />
-                            </div>
-                            <div class="col-12 ">
-                              <img src="assets/images/image 169.png" alt="" />
-                            </div>
-                          </div>
-                        </div>
+
+                      <div className="d-flex flex-column my-2">
+                        <label htmlFor="category" className="my-3">
+                          Category
+                        </label>
+                        <input
+                          type="text"
+                          name="category"
+                          id="category"
+                          className="w-100 border rounded-3 py-1 px-2"
+                          value={product.category}
+                          onChange={handleChange}
+                          required
+                        />
                       </div>
-                    </div>
-                    <div class="d-flex p-3 justify-content-end ">
-                      <input
-                        type="submit"
-                        value="Submit"
-                        class="submit py-2 px-5 rounded-3"
-                      />
+
+                      <div className="d-flex flex-column my-2">
+                        <label htmlFor="price" className="my-3">
+                          Price
+                        </label>
+                        <input
+                          type="number"
+                          name="priceWithoutGst"
+                          id="priceWithoutGst"
+                          className="w-100 border rounded-3 py-1 px-2"
+                          value={product.priceWithoutGst}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="d-flex flex-column my-2">
+                        <label htmlFor="hsnCode" className="my-3">
+                          HSN Code
+                        </label>
+                        <input
+                          type="number"
+                          name="hsnCode"
+                          id="hsnCode"
+                          className="w-100 border rounded-3 py-1 px-2"
+                          value={product.hsnCode}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="d-flex flex-column my-2">
+                        <label htmlFor="gstRate" className="my-3">
+                          GST Tax Rate (%)
+                        </label>
+                        <input
+                          type="number"
+                          name="gstRate"
+                          id="gstRate"
+                          className="w-100 border rounded-3 py-1 px-2"
+                          value={product.gstRate}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="d-flex flex-column my-2">
+                        <label htmlFor="discount" className="my-3">
+                          Discount
+                        </label>
+                        <input
+                          type="number"
+                          name="discount"
+                          id="discount"
+                          className="w-100 border rounded-3 py-1 px-2"
+                          value={product.discount}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="d-flex flex-column my-2">
+                        <label htmlFor="description" className="my-3">
+                          Description
+                        </label>
+                        <textarea
+                          name="description"
+                          id="description"
+                          rows="5"
+                          className="W-100 border rounded-3 py-1 px-2"
+                          value={product.description}
+                          onChange={handleChange}
+                          required
+                        ></textarea>
+                      </div>
                     </div>
                   </div>
-                </form>
-              </div>
-              {/* <!-- Modal footer --> */}
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-danger"
-                  data-bs-dismiss="modal"
-                >
-                  Close
-                </button>
-              </div>
+
+                  <div className="d-flex p-3 justify-content-end">
+                    <input
+                      type="submit"
+                      value="Submit"
+                      className="submit py-2 px-5 rounded-3"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-danger"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
+      </div>
       </section>
 
       {/* <!--===================== counter table ==================--> */}
@@ -634,7 +705,6 @@ const Products = () => {
                   <tr key={index} class="text-center">
                     <td>{product.id}</td>
                     <td class="product-img">
-                      {/* <img src={product.fImage1} alt="" /> */}
                       <img
                         src={`http://localhost:2008/${product.fImage1.replace(
                           /\\/g,
@@ -1121,7 +1191,7 @@ const Products = () => {
                         target="_self"
                         title="view"
                         data-bs-toggle="modal"
-                        data-bs-target="#myModaldelete"
+                        data-bs-target={`#myModaldelete-${product.id}`}
                       >
                         <img
                           src="assets/vectors/Frame (5).png"
@@ -1129,7 +1199,10 @@ const Products = () => {
                           class=""
                         />
                       </button>
-                      <div class="modal text-start fade" id="myModaldelete">
+                      <div
+                        class="modal text-start fade myModaldelete"
+                        id={`myModaldelete-${product.id}`}
+                      >
                         <div class="modal-dialog ">
                           <div class="modal-content">
                             {/* <!-- Modal Header --> */}
@@ -1164,7 +1237,11 @@ const Products = () => {
                               >
                                 Close
                               </button>
-                              <button type="button" class="btn btn-primary">
+                              <button
+                                onClick={() => deleteProduct(product.id)}
+                                type="button"
+                                class="btn btn-primary"
+                              >
                                 Delete
                               </button>
                             </div>
@@ -1174,98 +1251,6 @@ const Products = () => {
                     </td>
                   </tr>
                 ))}
-
-                <tr class="text-center">
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr class="text-center">
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr class="text-center">
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr class="text-center">
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr class="text-center">
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr class="text-center">
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr class="text-center">
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
               </tbody>
             </table>
           </div>

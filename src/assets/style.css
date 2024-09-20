@@ -350,31 +350,31 @@ tbody {
   width: 100%;
 }
 
-#myModaldelete .modal-footer .btn-primary,
-#myModalreject .modal-footer .btn-primary {
+.myModaldelete .modal-footer .btn-primary,
+.myModalreject .modal-footer .btn-primary {
   background-color: var(--red-color);
   border: 0;
 }
 
-#myModaldelete .deletebtn,
+.myModaldelete .deletebtn,
 #myModalreject .deletebtn {
   background-color: transparent !important;
   border: 0;
   border-radius: 100%;
 }
 
-#myModaldelete .modal-footer .btn-danger {
+.myModaldelete .modal-footer .btn-danger {
   background-color: var(--btn-bg-secondary);
   border: 0;
 }
 
-#myModalreject .modal-footer .btn-success {
+.myModalreject .modal-footer .btn-success {
   background-color: var(--approve-btn);
   border: 0;
 }
 
-#myModaldelete .modal-footer .btn-danger:hover,
-#myModaldelete .modal-footer .btn-primary:hover,
+.myModaldelete .modal-footer .btn-danger:hover,
+.myModaldelete .modal-footer .btn-primary:hover,
 #myModalreject .modal-footer .btn-success,
 #myModalreject .modal-footer .btn-primary {
   color: var(--color-white);
