@@ -934,7 +934,7 @@ const Branch_Details = () => {
                                     <div class="col-lg-6 col-12">
                                       <div class="d-flex flex-column">
                                         <label for="Branch-ID" class="my-3">
-                                          Branch ID
+                                          Branch Name
                                         </label>
                                         <input
                                           type="text"
@@ -943,7 +943,7 @@ const Branch_Details = () => {
                                           title="number"
                                           class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
                                           required
-                                          placeholder={branch.id}
+                                          value={branch.id}
                                         />
                                       </div>
                                       <div class="d-flex flex-column my-2">
@@ -957,7 +957,7 @@ const Branch_Details = () => {
                                           title="Enter Quantity"
                                           class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
                                           required
-                                          placeholder={branch.branchId}
+                                          value={branch.branchId}
                                         />
                                       </div>
                                       <div class="d-flex flex-column my-2">
@@ -971,7 +971,7 @@ const Branch_Details = () => {
                                           title="time"
                                           class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
                                           required
-                                          placeholder={`${branch.branchId}@123#`}
+                                          value={`${branch.branchId}@123#`}
                                         />
                                       </div>
                                     </div>
@@ -990,7 +990,7 @@ const Branch_Details = () => {
                                           title="number"
                                           class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
                                           required
-                                          placeholder={branch.branchHead}
+                                          value={branch.branchHead}
                                         />
                                       </div>
                                       <div class="d-flex flex-column my-2">
@@ -1007,7 +1007,7 @@ const Branch_Details = () => {
                                           title="Enter Quantity"
                                           class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
                                           required
-                                          placeholder={branch.branchHeadMobile}
+                                          value={branch.branchHeadMobile}
                                         />
                                       </div>
                                       <div class="d-flex flex-column my-2">
@@ -1024,7 +1024,7 @@ const Branch_Details = () => {
                                           title="Enter Quantity"
                                           class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
                                           required
-                                          placeholder={branch.alternateMobile}
+                                          value={branch.alternateMobile}
                                         />
                                       </div>
                                     </div>

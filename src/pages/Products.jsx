@@ -22,70 +22,109 @@ const Products = () => {
     }
   }, []);
 
-
   const [product, setProduct] = useState({
-      skuId: '',
-      productName: '',
-      category: '',
-      priceWithoutGst: '',
-      hsnCode: '',
-      gstRate: '',
-      discount: '',
-      rating:'',
-      review:'',
-      aboutThisItem:'',
-      productDescription: '',
-      fVideo: '',
-      fImage1: '',
-      fImage2: '',
-      fImage3: '',
-      fImage4: '',
-      fImage5: '',
-      fImage6: '',
-      fImage7: '',  
-      fImage8: '',
-      fImage9: '',
-      fImage10: '',
+    skuId: "",
+    productName: "",
+    category: "",
+    priceWithoutGst: "",
+    hsnCode: "",
+    gstRate: "",
+    discount: "",
+    rating: "",
+    review: "",
+    aboutThisItem: "",
+    productDescription: "",
+    fVideo: "",
+    fImage1: "",
+    fImage2: "",
+    fImage3: "",
+    fImage4: "",
+    fImage5: "",
+    fImage6: "",
+    fImage7: "",
+    fImage8: "",
+    fImage9: "",
+    fImage10: "",
   });
-  
+
+  // Handle input changes for text and number fields
   const handleChange = (e) => {
-      setProduct({
-        ...product,
-        [e.target.name]: e.target.value,
-      });
+    const { name, value } = e.target;
+    setProduct({
+      ...product,
+      [name]: value,
+    });
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const formData = new FormData();
-    
-    // Append each field to the FormData
-    Object.keys(product).forEach((key) => {
-      formData.append(key, product[key]);
-    });
-  
+
+    // Append required fields
+    formData.append("skuId", product.skuId);
+    formData.append("productName", product.productName);
+    formData.append("category", product.category);
+    formData.append("priceWithoutGst", product.priceWithoutGst);
+    formData.append("hsnCode", product.hsnCode);
+    formData.append("gstRate", product.gstRate);
+    formData.append("discount", product.discount);
+    formData.append("productDescription", product.productDescription);
+
+    // Append optional fields
+    if (product.review) formData.append("review", product.review);
+    if (product.rating) formData.append("rating", product.rating);
+    if (product.aboutThisItem)
+      formData.append("aboutThisItem", product.aboutThisItem);
+
+    // Append file fields
+    if (product.fImage1) {
+      formData.append("fImage1", product.fImage1);
+    }
+    if (product.fImage2) {
+      formData.append("fImage2", product.fImage2);
+    }
+    if (product.fVideo) {
+      formData.append("fVideo", product.fVideo);
+    }
+
     try {
-      await axios.post(
-        "http://localhost:2008/api/product/addproduct",
-        formData,
-        {
+      await axios
+        .post("http://localhost:2008/api/product/addproduct", formData, {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data', // This is important for file uploads
+            "Content-Type": "multipart/form-data", // Important for file uploads
           },
           withCredentials: true,
-        }
-      );
-      alert('Product added successfully');
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            window.location.reload(); // Reload the page after adding the branch
+          }
+        });
+      alert("Product added successfully");
     } catch (error) {
-      console.log(error);
-      alert('Failed to add product');
+      console.log(error.response?.data || error.message);
+      alert("Failed to add product");
     }
   };
-  
-  
-  
+
+  const [previews, setPreviews] = useState({
+    fImage1: null,
+    fImage2: null,
+    fVideo: null,
+  });
+
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    if (files[0]) {
+      const file = files[0];
+      const previewURL = URL.createObjectURL(file);
+      setPreviews((prev) => ({ ...prev, [name]: previewURL }));
+      setProduct((prev) => ({ ...prev, [name]: file }));
+    }
+  };
+
   const updateProduct = () => {
     try {
       axios.put("http://localhost:2008/api/product/updateproduct");
@@ -102,10 +141,16 @@ const Products = () => {
           Authorization: `Bearer ${token}`, // Include the token in the Authorization header
         },
         withCredentials: true, // Include credentials if necessary
-      });
+      }).then((res) => {
+        if (res.status === 200) {
+          // Only reload the page after the branch is deleted
+          window.location.reload();
+        }
+      })
     } catch (error) {
       console.log(error);
     }
+  
   };
 
   return (
@@ -462,171 +507,281 @@ const Products = () => {
 
         {/* <!-- The Modal --> */}
         {/* The Modal */}
-      <div className="modal fade" id="myModal">
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            {/* Modal Header */}
-            <div className="modal-header one rounded-0">
-              <h4 className="modal-title">Add Product</h4>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
+        <div className="modal fade" id="myModal">
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              {/* Modal Header */}
+              <div className="modal-header one rounded-0">
+                <h4 className="modal-title">Add Product</h4>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                ></button>
+              </div>
 
-            {/* Modal Body */}
-            <div className="modal-body">
-              <form onSubmit={handleSubmit}>
-                <div className="one py-3 px-3 pb-0">
-                  <div className="row">
-                    <div className="col-lg-6 col-12">
-                      <div className="d-flex flex-column">
-                        <label htmlFor="skuId" className="my-3">
-                          Product SKU id
-                        </label>
-                        <input
-                          type="text"
-                          name="skuId"
-                          id="skuId"
-                          className="w-100 border rounded-3 py-1 px-2"
-                          value={product.skuId}
-                          onChange={handleChange}
-                          required
-                        />
+              {/* Modal Body */}
+              <div className="modal-body">
+                <form onSubmit={handleSubmit}>
+                  <div className="one py-3 px-3 pb-0">
+                    <div className="row">
+                      <div className="col-lg-6 col-12">
+                        <div className="d-flex flex-column">
+                          <label htmlFor="skuId" className="my-3">
+                            Product SKU id
+                          </label>
+                          <input
+                            type="text"
+                            name="skuId"
+                            id="skuId"
+                            className="w-100 border rounded-3 py-1 px-2"
+                            value={product.skuId}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="productName" className="my-3">
+                            Product Name
+                          </label>
+                          <input
+                            type="text"
+                            name="productName"
+                            id="productName"
+                            className="w-100 border rounded-3 py-1 px-2"
+                            value={product.productName}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="category" className="my-3">
+                            Category
+                          </label>
+                          <input
+                            type="text"
+                            name="category"
+                            id="category"
+                            className="w-100 border rounded-3 py-1 px-2"
+                            value={product.category}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="price" className="my-3">
+                            Price
+                          </label>
+                          <input
+                            type="number"
+                            name="priceWithoutGst"
+                            id="priceWithoutGst"
+                            className="w-100 border rounded-3 py-1 px-2"
+                            value={product.priceWithoutGst}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="hsnCode" className="my-3">
+                            HSN Code
+                          </label>
+                          <input
+                            type="number"
+                            name="hsnCode"
+                            id="hsnCode"
+                            className="w-100 border rounded-3 py-1 px-2"
+                            value={product.hsnCode}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="gstRate" className="my-3">
+                            GST Tax Rate (%)
+                          </label>
+                          <input
+                            type="number"
+                            name="gstRate"
+                            id="gstRate"
+                            className="w-100 border rounded-3 py-1 px-2"
+                            value={product.gstRate}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="discount" className="my-3">
+                            Discount
+                          </label>
+                          <input
+                            type="number"
+                            name="discount"
+                            id="discount"
+                            className="w-100 border rounded-3 py-1 px-2"
+                            value={product.discount}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="discount" className="my-3">
+                            Review
+                          </label>
+                          <input
+                            type="number"
+                            name="review"
+                            id="review"
+                            className="w-100 border rounded-3 py-1 px-2"
+                            value={product.review}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="discount" className="my-3">
+                            Rating
+                          </label>
+                          <input
+                            type="number"
+                            name="rating"
+                            id="rating"
+                            className="w-100 border rounded-3 py-1 px-2"
+                            value={product.rating}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="description" className="my-3">
+                            About this Item
+                          </label>
+                          <textarea
+                            name="aboutThisItem"
+                            id="aboutThisItem"
+                            rows="5"
+                            className="w-100 border rounded-3 py-1 px-2"
+                            value={product.aboutThisItem}
+                            onChange={handleChange}
+                            required
+                          ></textarea>
+                        </div>
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="description" className="my-3">
+                            Description
+                          </label>
+                          <textarea
+                            name="productDescription"
+                            id="description"
+                            rows="5"
+                            className="w-100 border rounded-3 py-1 px-2"
+                            value={product.productDescription}
+                            onChange={handleChange}
+                            required
+                          ></textarea>
+                        </div>
+
+                        {/* File Upload Inputs */}
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="fImage1" className="my-3">
+                            Product Image 1
+                          </label>
+                          <input
+                            type="file"
+                            name="fImage1"
+                            id="fImage1"
+                            onChange={handleFileChange}
+                          />
+                        </div>
+
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="fImage2" className="my-3">
+                            Product Image 2
+                          </label>
+                          <input
+                            type="file"
+                            name="fImage2"
+                            id="fImage2"
+                            onChange={handleFileChange}
+                          />
+                        </div>
+
+                        <div className="d-flex flex-column my-2">
+                          <label htmlFor="fVideo" className="my-3">
+                            Product Video
+                          </label>
+                          <input
+                            type="file"
+                            name="fVideo"
+                            id="fVideo"
+                            onChange={handleFileChange}
+                          />
+                        </div>
+
+                        <div className="d-flex p-3 justify-content-end">
+                          <input
+                            type="submit"
+                            value="Submit"
+                            className="submit py-2 px-5 rounded-3"
+                          />
+                        </div>
                       </div>
-
-                      <div className="d-flex flex-column my-2">
-                        <label htmlFor="productName" className="my-3">
-                          Product Name
-                        </label>
-                        <input
-                          type="text"
-                          name="productName"
-                          id="productName"
-                          className="w-100 border rounded-3 py-1 px-2"
-                          value={product.productName}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-
-                      <div className="d-flex flex-column my-2">
-                        <label htmlFor="category" className="my-3">
-                          Category
-                        </label>
-                        <input
-                          type="text"
-                          name="category"
-                          id="category"
-                          className="w-100 border rounded-3 py-1 px-2"
-                          value={product.category}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-
-                      <div className="d-flex flex-column my-2">
-                        <label htmlFor="price" className="my-3">
-                          Price
-                        </label>
-                        <input
-                          type="number"
-                          name="priceWithoutGst"
-                          id="priceWithoutGst"
-                          className="w-100 border rounded-3 py-1 px-2"
-                          value={product.priceWithoutGst}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-
-                      <div className="d-flex flex-column my-2">
-                        <label htmlFor="hsnCode" className="my-3">
-                          HSN Code
-                        </label>
-                        <input
-                          type="number"
-                          name="hsnCode"
-                          id="hsnCode"
-                          className="w-100 border rounded-3 py-1 px-2"
-                          value={product.hsnCode}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-
-                      <div className="d-flex flex-column my-2">
-                        <label htmlFor="gstRate" className="my-3">
-                          GST Tax Rate (%)
-                        </label>
-                        <input
-                          type="number"
-                          name="gstRate"
-                          id="gstRate"
-                          className="w-100 border rounded-3 py-1 px-2"
-                          value={product.gstRate}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-
-                      <div className="d-flex flex-column my-2">
-                        <label htmlFor="discount" className="my-3">
-                          Discount
-                        </label>
-                        <input
-                          type="number"
-                          name="discount"
-                          id="discount"
-                          className="w-100 border rounded-3 py-1 px-2"
-                          value={product.discount}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-
-                      <div className="d-flex flex-column my-2">
-                        <label htmlFor="description" className="my-3">
-                          Description
-                        </label>
-                        <textarea
-                          name="description"
-                          id="description"
-                          rows="5"
-                          className="W-100 border rounded-3 py-1 px-2"
-                          value={product.description}
-                          onChange={handleChange}
-                          required
-                        ></textarea>
+                      <div className="col-lg-6 col-12">
+                        <h5>Preview</h5>
+                        <div className="preview-container">
+                          {previews.fImage1 && (
+                            <img
+                              src={previews.fImage1}
+                              alt="Preview 1"
+                              className="img-preview"
+                              style={{ width: "100%", height: "auto" }}
+                            />
+                          )}
+                          {previews.fImage2 && (
+                            <img
+                              src={previews.fImage2}
+                              alt="Preview 2"
+                              className="img-preview"
+                              style={{ width: "100%", height: "auto" }}
+                            />
+                          )}
+                          {previews.fVideo && (
+                            <video
+                              controls
+                              className="video-preview"
+                              style={{ width: "100%", height: "auto" }}
+                            >
+                              <source src={previews.fVideo} type="video/mp4" />
+                              Your browser does not support the video tag.
+                            </video>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
+                </form>
+              </div>
 
-                  <div className="d-flex p-3 justify-content-end">
-                    <input
-                      type="submit"
-                      value="Submit"
-                      className="submit py-2 px-5 rounded-3"
-                    />
-                  </div>
-                </div>
-              </form>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-danger"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
+              {/* Modal Footer */}
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </section>
 
       {/* <!--===================== counter table ==================--> */}
@@ -726,7 +881,7 @@ const Products = () => {
                         target="_self"
                         title="view"
                         data-bs-toggle="modal"
-                        data-bs-target="#myModalView"
+                        data-bs-target={`#myModalView-${product.id}`}
                       >
                         <img
                           src="assets/vectors/Frame (3).png"
@@ -734,7 +889,10 @@ const Products = () => {
                           class=""
                         />
                       </button>
-                      <div class="modal text-start fade" id="myModalView">
+                      <div
+                        class="modal text-start fade"
+                        id={`myModalView-${product.id}`}
+                      >
                         <div class="modal-dialog modal-lg">
                           <div class="modal-content">
                             {/* <!-- Modal Header --> */}
@@ -751,196 +909,242 @@ const Products = () => {
                             </div>
 
                             {/* <!-- Modal body --> */}
-                            <div class="modal-body add-product-tbl">
-                              <form action="#">
-                                <div class="one py-3 px-3 pb-0">
-                                  <div class="row">
-                                    <div class="col-lg-6 col-12">
-                                      <div class="d-flex flex-column">
-                                        <label
-                                          for="Product-SKU-id"
-                                          class="my-3"
-                                        >
+                            <div className="modal-body">
+                              <form onSubmit={handleSubmit}>
+                                <div className="one py-3 px-3 pb-0">
+                                  <div className="row">
+                                    <div className="col-lg-6 col-12">
+                                      <div className="d-flex flex-column">
+                                        <label htmlFor="skuId" className="my-3">
                                           Product SKU id
                                         </label>
                                         <input
                                           type="text"
-                                          name="Product-SKU-id"
-                                          id="Product-SKU-id"
-                                          title="number"
-                                          class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                                          required
+                                          name="skuId"
+                                          id="skuId"
+                                          className="w-100 border rounded-3 py-1 px-2"
+                                          value={product.skuId}
+                                          disabled
                                         />
                                       </div>
-                                      <div class="d-flex flex-column my-2">
-                                        <label for="Product-name" class="my-3">
-                                          Product name
+
+                                      <div className="d-flex flex-column my-2">
+                                        <label
+                                          htmlFor="productName"
+                                          className="my-3"
+                                        >
+                                          Product Name
                                         </label>
                                         <input
                                           type="text"
-                                          name="Product-name"
-                                          id="Product-name"
-                                          title="Enter Quantity"
-                                          class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                                          required
+                                          name="productName"
+                                          id="productName"
+                                          className="w-100 border rounded-3 py-1 px-2"
+                                          value={product.productName}
+                                          disabled
                                         />
                                       </div>
-                                      <div class="d-flex flex-column my-2">
-                                        <label for="Category" class="my-3">
+
+                                      <div className="d-flex flex-column my-2">
+                                        <label
+                                          htmlFor="category"
+                                          className="my-3"
+                                        >
                                           Category
                                         </label>
                                         <input
                                           type="text"
-                                          name="Category"
-                                          id="Category"
-                                          title="time"
-                                          class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                                          required
+                                          name="category"
+                                          id="category"
+                                          className="w-100 border rounded-3 py-1 px-2"
+                                          value={product.category}
+                                          disabled
                                         />
                                       </div>
-                                      <div class="d-flex flex-column my-2">
-                                        <label for="Price" class="my-3">
+
+                                      <div className="d-flex flex-column my-2">
+                                        <label htmlFor="price" className="my-3">
                                           Price
                                         </label>
                                         <input
                                           type="number"
-                                          name="Price"
-                                          id="Price"
-                                          title="time"
-                                          class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                                          required
+                                          name="priceWithoutGst"
+                                          id="priceWithoutGst"
+                                          className="w-100 border rounded-3 py-1 px-2"
+                                          value={product.priceWithoutGst}
+                                          disabled
                                         />
                                       </div>
-                                      <div class="d-flex flex-column my-2">
-                                        <label for="HSN-code" class="my-3">
-                                          HSN code
+
+                                      <div className="d-flex flex-column my-2">
+                                        <label
+                                          htmlFor="hsnCode"
+                                          className="my-3"
+                                        >
+                                          HSN Code
                                         </label>
                                         <input
                                           type="number"
-                                          name="HSN-code"
-                                          id="HSN-code"
-                                          title="time"
-                                          class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                                          required
+                                          name="hsnCode"
+                                          id="hsnCode"
+                                          className="w-100 border rounded-3 py-1 px-2"
+                                          value={product.hsnCode}
+                                          disabled
                                         />
                                       </div>
-                                      <div class="d-flex flex-column my-2">
-                                        <label for="GST-tax-rate" class="my-3">
-                                          GST tax rate(%)
+
+                                      <div className="d-flex flex-column my-2">
+                                        <label
+                                          htmlFor="gstRate"
+                                          className="my-3"
+                                        >
+                                          GST Tax Rate (%)
                                         </label>
                                         <input
                                           type="number"
-                                          name="GST-tax-rate"
-                                          id="GST-tax-rate"
-                                          title="time"
-                                          class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                                          required
+                                          name="gstRate"
+                                          id="gstRate"
+                                          className="w-100 border rounded-3 py-1 px-2"
+                                          value={product.gstRate}
+                                          disabled
                                         />
                                       </div>
-                                      <div class="d-flex flex-column my-2">
-                                        <label for="MRP" class="my-3">
-                                          MRP
+
+                                      <div className="d-flex flex-column my-2">
+                                        <label
+                                          htmlFor="discount"
+                                          className="my-3"
+                                        >
+                                          Discount
                                         </label>
                                         <input
                                           type="number"
-                                          name="MRP"
-                                          id="MRP"
-                                          title="time"
-                                          class="w-100 border rounded-3 py-1 px-2 focus-ring-none"
-                                          required
+                                          name="discount"
+                                          id="discount"
+                                          className="w-100 border rounded-3 py-1 px-2"
+                                          value={product.discount}
+                                          disabled
                                         />
                                       </div>
-                                      <div class="d-flex flex-column my-2">
-                                        <label for="Description" class="my-3">
+                                      <div className="d-flex flex-column my-2">
+                                        <label
+                                          htmlFor="discount"
+                                          className="my-3"
+                                        >
+                                          Review
+                                        </label>
+                                        <input
+                                          type="number"
+                                          name="review"
+                                          id="review"
+                                          className="w-100 border rounded-3 py-1 px-2"
+                                          value={product.review}
+                                          disabled
+                                        />
+                                      </div>
+                                      <div className="d-flex flex-column my-2">
+                                        <label
+                                          htmlFor="discount"
+                                          className="my-3"
+                                        >
+                                          Rating
+                                        </label>
+                                        <input
+                                          type="number"
+                                          name="rating"
+                                          id="rating"
+                                          className="w-100 border rounded-3 py-1 px-2"
+                                          value={product.rating}
+                                          disabled
+                                        />
+                                      </div>
+
+                                      <div className="d-flex flex-column my-2">
+                                        <label
+                                          htmlFor="description"
+                                          className="my-3"
+                                        >
+                                          About this Item
+                                        </label>
+                                        <textarea
+                                          name="aboutThisItem"
+                                          id="aboutThisItem"
+                                          rows="5"
+                                          className="w-100 border rounded-3 py-1 px-2"
+                                          value={product.aboutThisItem}
+                                          disabled
+                                        ></textarea>
+                                      </div>
+                                      <div className="d-flex flex-column my-2">
+                                        <label
+                                          htmlFor="description"
+                                          className="my-3"
+                                        >
                                           Description
                                         </label>
-
                                         <textarea
-                                          name="Description"
-                                          id="Description"
+                                          name="productDescription"
+                                          id="description"
                                           rows="5"
-                                          class="W-100 border rounded-3 py-1 px-2 focus-ring-none"
-                                          required
+                                          className="w-100 border rounded-3 py-1 px-2"
+                                          value={product.productDescription}
+                                          disabled
                                         ></textarea>
                                       </div>
                                     </div>
-                                    <div class="col-lg-6 col-12">
-                                      <div class="d-flex flex-column my-0 bg-white rounded-3 p-3">
-                                        <label
-                                          for="Employ-Mobile-No"
-                                          class="my-3"
-                                        >
-                                          Employ Mobile No.
-                                        </label>
-                                        <div class="row gy-lg-4 gy-md-3 gy-sm-2 gy-2">
-                                          <div class="col-8 px-1 px-md-2">
-                                            <img
-                                              src="assets/images/image 169.png"
-                                              alt=""
+                                    <div className="col-lg-6 col-12">
+                                      <h5>Images & Videos</h5>
+                                      <div className="preview-container">
+                                        {product.fImage1 && (
+                                          <img
+                                            src={`http://localhost:2008/${product.fImage1.replace(
+                                              /\\/g,
+                                              "/"
+                                            )}`}
+                                            alt={product.productName}
+                                            className="img-preview"
+                                            style={{
+                                              width: "100%",
+                                              height: "auto",
+                                            }}
+                                          />
+                                        )}
+                                        {product.fImage2 && (
+                                          <img
+                                            src={`http://localhost:2008/${product.fImage2.replace(
+                                              /\\/g,
+                                              "/"
+                                            )}`}
+                                            alt={product.productName}
+                                            className="img-preview"
+                                            style={{
+                                              width: "100%",
+                                              height: "auto",
+                                            }}
+                                          />
+                                        )}
+                                        {product.fVideo && (
+                                          <video
+                                            controls
+                                            className="video-preview"
+                                            style={{
+                                              width: "100%",
+                                              height: "auto",
+                                            }}
+                                          >
+                                            <source
+                                              src={`http://localhost:2008/${product.fVideo.replace(
+                                                /\\/g,
+                                                "/"
+                                              )}`}
+                                              type="video/mp4"
                                             />
-                                          </div>
-                                          <div class="col-4 px-1 px-md-2 d-flex flex-column justify-content-between">
-                                            <img
-                                              src="assets/images/image 169.png"
-                                              alt=""
-                                            />
-                                            <img
-                                              src="assets/images/image 169.png"
-                                              alt=""
-                                            />
-                                          </div>
-                                          <div class="col-4 px-1 px-md-2">
-                                            <img
-                                              src="assets/images/image 169.png"
-                                              alt=""
-                                            />
-                                          </div>
-                                          <div class="col-4 px-1 px-md-2">
-                                            <img
-                                              src="assets/images/image 169.png"
-                                              alt=""
-                                            />
-                                          </div>
-                                          <div class="col-4 px-1 px-md-2">
-                                            <img
-                                              src="assets/images/image 169.png"
-                                              alt=""
-                                            />
-                                          </div>
-                                          <div class="col-4 px-1 px-md-2">
-                                            <img
-                                              src="assets/images/image 169.png"
-                                              alt=""
-                                            />
-                                          </div>
-                                          <div class="col-4 px-1 px-md-2">
-                                            <img
-                                              src="assets/images/image 169.png"
-                                              alt=""
-                                            />
-                                          </div>
-                                          <div class="col-4 px-1 px-md-2">
-                                            <img
-                                              src="assets/images/image 169.png"
-                                              alt=""
-                                            />
-                                          </div>
-                                          <div class="col-12 ">
-                                            <img
-                                              src="assets/images/image 169.png"
-                                              alt=""
-                                            />
-                                          </div>
-                                        </div>
+                                            Your browser does not support the
+                                            video tag.
+                                          </video>
+                                        )}
                                       </div>
                                     </div>
-                                  </div>
-                                  <div class="d-flex p-3 justify-content-end ">
-                                    <input
-                                      type="submit"
-                                      value="Submit"
-                                      class="submit py-2 px-5 rounded-3"
-                                    />
                                   </div>
                                 </div>
                               </form>
@@ -1238,7 +1442,9 @@ const Products = () => {
                                 Close
                               </button>
                               <button
-                                onClick={() => deleteProduct(product.id)}
+                                onClick={() => {
+                                  deleteProduct(product.id);
+                                }}
                                 type="button"
                                 class="btn btn-primary"
                               >

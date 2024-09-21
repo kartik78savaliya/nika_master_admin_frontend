@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Customers from "./pages/customers";
 import Inventory from "./pages/Inventory";
@@ -21,13 +21,18 @@ import Login from "./pages/Login";
 import { useCookies } from "react-cookie";
 
 const App = () => {
-  const [cookies, setCookie, removeCookie] = useCookies(["authToken"]);
+  const [cookies] = useCookies(["authToken"]);
 
   return (
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<Home cookies={cookies} />} />
+          <Route 
+            path="/" 
+            element={
+              cookies.authToken ? <Home cookies={cookies} /> : <Navigate to="/Login" />
+            } 
+          />
           <Route path="/Customers" element={<Customers />} />
           <Route path="/Inventory" element={<Inventory />} />
           <Route path="/Products" element={<Products />} />
